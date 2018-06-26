@@ -1,0 +1,129 @@
+<html>
+
+<head>
+
+    <script>
+        var updateid = 0;
+        function getAll() {
+         var url = "http://localhost:8080/country";
+            var request;
+            if (window.XMLHttpRequest) {
+                request = new XMLHttpRequest();
+            }
+
+            request.onreadystatechange = function () {
+                if (request.readyState == 4) {
+                    myObj = JSON.parse(this.responseText);
+                    alert("myobj"+JSON.stringify(myObj));
+                    var txt = "<table border='1'>"
+                    txt += "<th>Country Name</th>";
+
+                    for (x in myObj) {
+                        txt += "<tr><td>" + myObj[x].country + "</td>";
+                        txt += '<td><button onclick="edit(' + x + ')">Edit</button></td>';
+                        txt += '<td><button onclick="delete1(' + x + ')">Delete</button></td></tr>';
+                       
+                    }
+                    txt += "</table>"
+                    document.getElementById("demo").innerHTML = txt;
+
+                }
+            }
+            request.open("GET", url, true);
+            request.send();
+          
+        }
+        function addAndUpdate() {
+            ((document.getElementById('buttonType').innerHTML == "Save") ? this.add() : this.update());
+        }
+        function add() {
+            var textboxvalue = document.getElementById('country');
+            var addcountry = textboxvalue.value;
+          
+
+            var url = "http://localhost:8080/country";
+
+            var data = {};
+            data.id = 0;
+            data.country = addcountry;
+            var json = JSON.stringify(data);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.onload = function () {
+                var users = JSON.parse(xhr.responseText);
+                if (xhr.readyState == 4 && xhr.status == "201") {
+                    console.table(users);
+                } else {
+                    console.error(users);
+                }
+            }
+            xhr.send(json);
+        }
+        function delete1(x) {
+          
+            myObj.splice(x, 1);
+            x = x + 1;
+            var url = "http://localhost:8080/country/" + x;
+            var xhr = new XMLHttpRequest();
+            xhr.open("DELETE", url, true);
+            xhr.onload = function () {
+                var users = JSON.parse(xhr.responseText);
+              
+                if (xhr.readyState == 4 && xhr.status == "200") {
+                    console.table(users);
+                } else {
+                    console.error(users);
+                }
+
+            }
+            xhr.send(null);
+
+        }
+        function edit(x) {
+            document.getElementById('buttonType').innerHTML = "update";
+        
+            document.getElementById('country').value = myObj[x].country;
+            updateid = x + 1;
+           
+        
+        }
+        function update() {
+            var textboxvalue = document.getElementById('country');
+            var updatecountry = textboxvalue.value
+            var data = {};
+          
+            data.id = updateid;
+           
+            data.country = updatecountry;
+            var json =  JSON.stringify(data);
+            var url = "http://localhost:8080/country/"+updateid;
+            var xhr = new XMLHttpRequest();
+            xhr.open("PUT", url, true);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.onload = function () {
+                var users = JSON.parse(xhr.responseText);
+                alert(JSON.stringify(users));
+                if (xhr.readyState == 4 && xhr.status == "200") {
+                    console.table(users);
+                } else {
+                    console.error(users);
+                }
+            }
+            xhr.send(json);
+    
+            document.getElementById('country').value = '';
+            document.getElementById('buttonType').innerHTML = "Save";
+        }
+    </script>
+
+</head>
+
+<body onload="getAll()">
+    <input type="text" id="country">
+    <button type="submit" id="buttonType" onclick="addAndUpdate()">Save</button>
+    <h1 id="demo"></h1>
+</body>
+
+</html>

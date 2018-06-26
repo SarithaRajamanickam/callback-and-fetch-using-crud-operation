@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+<body onload="loadDoc()">
+    <br><br> COUNTRY NAME:<input type="text" id="country">
+    <br><br></div>
+    <button type="button" id="buttonType" onclick="addAndUpdate()">Save</button>
+    <p id="demo"></p>
+    <script>
+        // updateid = 0;
+        // text = [];
+        function loadDoc() {
+            fetch('http://localhost:8080/country', { method: 'GET' })
+                .then(function (response) {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                })
+                .then(function (text) {
+                  
+                    var txt = "<table border='1'>"
+                    txt += "<th>Country Name</th><th>Action</th>";
+                    for (var i = 0; i < text.length; i++) {
+                        var deleteid = text[i].id;
+                        // alert("first"+deleteid);
+                        txt += "<tr><td>" + text[i].country + "</td>";
+                        txt += '<td><button onclick="edit(' + i + ')">Edit</button></td>';
+                        txt += '<td><button onclick="delete1(' + deleteid + ')">Delete</button></td></tr>';
+
+                    }
+                    txt += "</table>"
+
+                    document.getElementById("demo").innerHTML = txt;
+                })
+        }
+        function addAndUpdate() {
+            ((document.getElementById('buttonType').innerHTML == "Save") ? this.add() : this.update());
+        }
+        function add() {
+
+            fetch("http://localhost:8080/country", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify({
+                    "country": document.getElementById("country").value
+
+                })
+            })
+                .then((response) => {
+
+                    loadDoc();
+                    document.getElementById('country').value = '';
+                });
+
+        }
+
+   function delete1(deleteid) {
+        
+            //  deleteid = deleteid+1;
+            alert("second"+deleteid);
+            fetch("http://localhost:8080/country/" + deleteid, {
+                
+                method: "DELETE",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+            })
+            
+            .then((response) => {
+           
+                   loadDoc();
+                 
+                });
+            
+        }
+// function delete1(i)
+// {
+//      i = i + 1;
+//             fetch("http://localhost:8080/country/" + i).then(function(response)  {
+//                 if(response.OK&&response.INTERNAL_SERVER_ERROR) {
+//                  return response.json();
+//                 }
+//                 throw new Error('Network response was not ok.');
+//               }).then(function(response) { 
+// //   var objectURL = URL.createObjectURL(myBlob); 
+// //   myImage.src = objectURL; 
+// }).catch(function(error) {
+//   console.log('There has been a problem with your fetch operation: ', error.message);
+// });  
+// }
+     
+
+        function edit(i) {
+            document.getElementById('buttonType').innerHTML = "update";
+
+            fetch('http://localhost:8080/country', { method: 'GET' })
+                .then(function (response) {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                })
+                .then(function (text) {
+                    document.getElementById('country').value = text[i].country;
+
+                    updateid = i+1;
+                    // alert("edit"+i);
+                })
+        }
+        function update() {
+        //  alert("update"+updateid);
+            fetch("http://localhost:8080/country/" + updateid, {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify({
+
+                    "country": document.getElementById("country").value
+                })
+
+            })
+
+                .then((response) => {
+                    document.getElementById('country').value = '';
+                    document.getElementById('buttonType').innerHTML = "Save";
+                     loadDoc();
+                });
+        }
+
+            //  alert("edit");
+            //   $.ajax({  
+
+            //         async: true,  
+            //         url:" http://localhost:8080/country",  
+            //         method: "GET",  
+
+            //         headers: {  
+            //             "accept": "application/json",  
+            //             "content-type": "application/json"  
+
+            //         },  
+            //         success: function(data) {  
+            //             alert(data.d.country); 
+            //             id = $('id').val(data.d.id) ;
+            //             country = $('#country').val(data.d.country);  
+
+            //         },  
+            //         error: function(error) {  
+            //             console.log(JSON.stringify(error));  
+
+            //         }  
+
+
+            //     })  
+
+
+//         function update(i)
+//         {
+//       crudFetch.put("http://localhost:8080/country"+i, {
+//     title: 'New title'
+// })
+// .then((body) => {
+//     // Successful callback.
+// }).catch(error)
+// { }
+// document.getElementById('country').value = '';
+//             document.getElementById('buttonType').innerHTML = "Save";
+// }
+    </script>
+</body>
+
+</html>
